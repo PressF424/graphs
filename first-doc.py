@@ -1,47 +1,49 @@
-class Graph:
-    def __init__(self, vertices):
-        self.V = vertices  # вершины
-        self.graph = []    # ребра
+class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.rank = [0] * n
 
-    def add_edge(self, u, v, w):
-        self.graph.append([u, v, w])
+    def find(self, u):
+        if self.parent[u] != u:
+            self.parent[u] = self.find(self.parent[u])
+        return self.parent[u]
 
-    def find(self, parent, i):
-        if parent[i] == i:
-            return i
-        return self.find(parent, parent[i])
+    def union(self, u, v):
+        root_u = self.find(u)
+        root_v = self.find(v)
 
-    def union(self, parent, rank, x, y):
-        root_x = self.find(parent, x)
-        root_y = self.find(parent, y)
-        if rank[root_x] < rank[root_y]:
-            parent[root_x] = root_y
-        elif rank[root_x] > rank[root_y]:
-            parent[root_y] = root_x
-        else:
-            parent[root_y] = root_x
-            rank[root_x] += 1
+        if root_u != root_v:
+            if self.rank[root_u] > self.rank[root_v]:
+                self.parent[root_v] = root_u
+            elif self.rank[root_u] < self.rank[root_v]:
+                self.parent[root_u] = root_v
+            else:
+                self.parent[root_v] = root_u
+                self.rank[root_u] += 1
 
-    def kruskal_mst(self):
-        self.graph = sorted(self.graph, key=lambda item: item[2])
-        parent = []
-        rank = []
-        result = []  #  минимальное  дерево
+def kruskal(n, edges):
+    edges.sort(key=lambda x: x[2])  # сорт по весу
+    uf = UnionFind(n)
+    mst = []
+    total_weight = 0
 
-        for node in range(self.V):
-            parent.append(node)
-            rank.append(0)
+    for u, v, weight in edges:
+        if uf.find(u) != uf.find(v):
+            uf.union(u, v)
+            mst.append((u, v, weight))
+            total_weight += weight
 
-        for u, v, w in self.graph:
-            x = self.find(parent, u)
-            y = self.find(parent, v)
-            if x != y:
-                result.append([u, v, w])
-                self.union(parent, rank, x, y)
+    return mst, total_weight
 
-        # Вывод минимального  дерева
-        total_weight = sum([w for u, v, w in result])
-        print("Минимальное остовное дерево включает следующие рёбра:")
-        for u, v, weight in result:
-            print(f"{u} -- {v} == {weight}")
-        print(f"Общая стоимость остовного дерева: {total_weight}")
+# использование
+edges = [
+    (0, 1, 10),
+    (0, 2, 6),
+    (0, 3, 5),
+    (1, 3, 15),
+    (2, 3, 4)
+]
+n = 4  # вершины
+mst, total_weight = kruskal(n, edges)
+print("Рёбра наикратчайшего связывающего дерева:", mst)
+print("Полный вес:", total_weight)
