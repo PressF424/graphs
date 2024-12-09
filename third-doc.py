@@ -7,7 +7,7 @@ class TreeNode:
 
 class AVLTree:
     def insert(self, root, key):
-        # 1. Выполнить обычную вставку
+        # обычная вставка
         if not root:
             return TreeNode(key)
         elif key < root.key:
@@ -15,26 +15,25 @@ class AVLTree:
         else:
             root.right = self.insert(root.right, key)
 
-        # 2. Обновить высоту предка узла
         root.height = 1 + max(self.get_height(root.left), self.get_height(root.right))
 
-        # 3. Получить баланс узла
+        #  баланс узла
         balance = self.get_balance(root)
 
-        # Левый левый случай
+        # Левый\левый случай
         if balance > 1 and key < root.left.key:
             return self.right_rotate(root)
 
-        # Правый правый случай
+        # Правый\правый случай
         if balance < -1 and key > root.right.key:
             return self.left_rotate(root)
 
-        # Левый правый случай
+        # Левый/правый случай
         if balance > 1 and key > root.left.key:
             root.left = self.left_rotate(root.left)
             return self.right_rotate(root)
 
-        # Правый левый случай
+        # Правый/левый случай
         if balance < -1 and key < root.right.key:
             root.right = self.right_rotate(root.right)
             return self.left_rotate(root)
@@ -98,5 +97,5 @@ if __name__ == "__main__":
     for key in keys:
         root = avl_tree.insert(root, key)
 
-    print("Обход построенного дерева AVL выполняется следующим образом:")
+    print("Обход построенного дерева  выполняется так: ")
     avl_tree.pre_order(root)
